@@ -6,22 +6,20 @@
     <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-balham.css">
 </head>
 <body>
-<!--<h1>Hello from ag-grid!</h1>-->
 
 <div id="myGrid" style="height: 600px;width:500px;" class="ag-theme-balham"></div>
 
 <script type="text/javascript" charset="utf-8">
     // specify the columns
-
     var columnDefs = [
-        {field: "time"},
-        {field: "BuyValue"},
-        {field: "SellValue"}
+        {headerName: "time", field: "time"},
+        {headerName: "underlying", field: "underlying"},
+        {headerName: "NetTradedValue", field: "NetTradedValue"},
+        {headerName: "LastSpotPrice", field: "LastSpotPrice"}
     ];
 
     // let the grid know which columns to use
     var gridOptions = {
-        rowModelType: 'serverSide',
         columnDefs: columnDefs
     };
 
@@ -31,8 +29,37 @@
     // create the grid passing in the div to use together with the columns & data we want to use
     new agGrid.Grid(eGridDiv, gridOptions);
 
-    gridOptions.api.setServerSideDatasource(value);
+    function jsonLoad(callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', './data.json');
+        xhr.responseType = 'json';
 
+        xhr.onload = function () {
+            if (this.status == 200) {
+                callback(this.response);
+            }
+
+        };
+
+        xhr.onerror = function () {
+            console.log('Loading Errorr')
+        };
+
+        xhr.send()
+    }
+
+    jsonLoad(function(data){
+        gridOptions.api.setRowData(data);
+        console.log('Got data:'+data);
+
+    });
+
+    // fetch('http://172.16.100.99:8888/').then(function (response) {
+    //     return response.json()
+    // }).then(function (data) {
+    //     console.log(data);
+    //     gridOptions.api.setRowData(data)
+    // });
 
 </script>
 </body>
